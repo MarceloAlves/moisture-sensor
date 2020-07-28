@@ -1,0 +1,53 @@
+{
+  "name": "moisture-sensor",
+  "version": "1.0.0",
+  "description": "Raspberry Pi Zero W based moisture sensor for this finicky fiddle leaf",
+  "author": "Marcelo Alves <marcelo.alves@hey.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarceloAlves/moisture-sensor.git"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 120,
+    "jsxSingleQuote": true
+  },
+  "scripts": {
+    "clean": "rm src/client/dist/*",
+    "start:client": "parcel src/client/index.html",
+    "build:client": "yarn clean && parcel build src/client/index.html --out-dir src/client/dist --public-url ./",
+    "start:server": "nodemon --watch src/server src/server/index.js",
+    "dev": "concurrently \"yarn run start:client\" \"yarn run start:server\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react"
+    ]
+  },
+  "dependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
+    "@chakra-ui/core": "^0.8.0",
+    "@emotion/core": "^10.0.28",
+    "@emotion/styled": "^10.0.27",
+    "@svgr/parcel-plugin-svgr": "^5.4.0",
+    "concurrently": "^5.2.0",
+    "emotion-theming": "^10.0.27",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4",
+    "onoff": "^6.0.0",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.0.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "rpi-gpio": "^2.1.7",
+    "rpio": "^2.1.1",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
+    "xstate": "^4.11.0"
+  }
+}
