@@ -1,11 +1,13 @@
 const rpio = require('rpio')
 const { Machine, interpret, assign } = require('xstate')
 
-function readPin() {
-  rpio.open(8, rpio.INPUT)
-  const result = rpio.read(8)
-  rpio.close(8)
-  return result
+function readPin(ctx, evt) {
+  return new Promise((resolve, reject) => {
+    rpio.open(8, rpio.INPUT)
+    const result = rpio.read(8)
+    rpio.close(8)
+    resolve({ reading: result })
+  })
 }
 
 const MOISTURE_LEVEL = {
@@ -24,59 +26,51 @@ const soilMachine = Machine(
     },
     states: {
       startup: {
-        on: {
-          SETUP: {
-            actions: ['initialReading'],
+        invoke: {
+          id: 'pinChecking',
+          src: readPin,
+          onDone: {
             target: 'idle',
+            actions: ['setPinValue'],
           },
         },
       },
       idle: {
         after: {
-          120000: 'running',
+          120000: 'checkingPin',
         },
       },
-      running: {
-        on: {
-          '': {
-            actions: 'checkPin',
+      checkingPin: {
+        invoke: {
+          id: 'pinChecking',
+          src: readPin,
+          onDone: {
             target: 'sendingAlert',
+            actions: ['setPinValue'],
           },
         },
       },
       sendingAlert: {
-        on: {
-          '': [
-            {
-              cond: 'shouldSendAlert',
-              actions: 'sendAlert',
-              target: 'idle',
-            },
-            { target: 'idle' },
-          ],
-        },
+        always: [
+          {
+            cond: 'shouldSendAlert',
+            actions: 'sendAlert',
+            target: 'idle',
+          },
+          { target: 'idle' },
+        ],
       },
     },
   },
   {
     actions: {
-      initialReading: assign((ctx, evt) => {
-        const result = readPin()
-        return {
-          previousReading: result,
-          currentReading: result,
-        }
-      }),
-      checkPin: assign((ctx, evt) => {
-        const currentReading = readPin()
-        return {
-          previousReading: ctx.currentReading,
-          currentReading,
-        }
-      }),
       sendAlert: () => {
         console.log('FEED ME SEYMOUR!')
       },
+      setPinValue: assign((ctx, evt) => ({
+        previousReading: ctx.currentReading || evt.data.reading,
+        currentReading: evt.data.reading,
+      })),
     },
     guards: {
       isWet: (ctx, evt) => ctx.currentReading === MOISTURE_LEVEL.WET,

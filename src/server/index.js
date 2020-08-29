@@ -26,9 +26,9 @@ server.listen(5000, () => {
 const io = require('socket.io')(server)
 
 const service = interpret(soilMachine)
-  .onTransition((data) => {
-    console.log('Transition', data.context)
-    io.emit('moistureLevel', data.context)
+  .onChange((data) => {
+    console.log('Transition', data)
+    io.emit('moistureLevel', data)
   })
   .start()
 
