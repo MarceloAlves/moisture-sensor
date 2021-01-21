@@ -46,7 +46,7 @@
     "react-dom": "^16.13.1",
     "rpi-gpio": "^2.1.7",
     "rpio": "^2.1.1",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "socket.io-client": "^2.3.0",
     "xstate": "^4.11.0"
   }
